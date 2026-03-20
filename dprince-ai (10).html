@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DPRINCE AI — Think. Create. Explore.</title>
+<meta name="description" content="DPRINCE AI — Intelligent chat, code generation, image creation and voice output."/>
+<meta property="og:title" content="DPRINCE AI"/>
+<meta property="og:description" content="Think. Create. Explore."/>
+<meta property="og:image" content="https://mrwale.vercel.app/IMG_4967.jpeg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" media="print" onload="this.media='all'">
+<style>
+:root {
+  --bg:#07090d;--bg2:#0b0f15;--surface:#101620;--sur2:#141c26;
+  --green:#00e676;--amber:#f5a623;--white:#dde4ee;--muted:#5c7080;--dim:#2a3a4a;
+  --bdr:rgba(0,230,118,0.12);--bdr-a:rgba(245,166,35,0.18);
+  --glow-g:0 0 32px rgba(0,230,118,0.15);--glow-a:0 0 32px rgba(245,166,35,0.18);
+  --radius:10px;--font:'Inter',sans-serif;--display:'Syne',sans-serif;--mono:'Space Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--white);font-weight:300;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,230,118,0.014) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,230,118,0.014) 1px,transparent 1px);background-size:60px 60px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.8)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes matrixRain{0%{transform:translateY(-100%);opacity:1}100%{transform:translateY(100vh);opacity:0}}
+
+/* LOADING */
+#appLoading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px;animation:hideLoader 0s 5s forwards}@keyframes hideLoader{to{display:none;opacity:0;pointer-events:none}}
+.load-logo{font-family:var(--display);font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,var(--green),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em}
+.load-spinner{width:30px;height:30px;border:2px solid var(--bdr);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+.load-sub{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase}
+
+/* AUTH */
+#authScreen{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
+  background:var(--bg);background-image:radial-gradient(ellipse at 20% 50%,rgba(0,230,118,.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 80% 20%,rgba(245,166,35,.05) 0%,transparent 50%)}
+.auth-wrap{width:100%;max-width:440px;margin:20px;animation:fadeUp .5s ease}
+.auth-card{background:var(--surface);border:1px solid var(--bdr);border-radius:16px;padding:44px 40px;
+  position:relative;overflow:hidden;box-shadow:var(--glow-g)}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--amber))}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-logo-name{font-family:var(--display);font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--green),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block;letter-spacing:-.02em}
+.auth-logo-tag{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:4px;display:block}
+.auth-title{font-family:var(--display);font-size:1.3rem;font-weight:700;text-align:center;color:var(--white);margin-bottom:6px}
+.auth-sub{font-size:.85rem;color:var(--muted);text-align:center;margin-bottom:28px}
+.auth-err{background:rgba(249,113,113,.08);border:1px solid rgba(249,113,113,.25);border-radius:8px;
+  padding:10px 14px;font-size:.8rem;color:#f97171;margin-bottom:14px;display:none}
+.auth-err.show{display:block}
+.btn-google{width:100%;padding:13px;background:var(--sur2);border:1px solid var(--bdr);border-radius:8px;
+  color:var(--white);font-family:var(--font);font-size:.88rem;font-weight:400;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;transition:all .22s;margin-bottom:12px}
+.btn-google:hover{border-color:var(--green);background:rgba(0,230,118,.06);box-shadow:var(--glow-g)}
+.auth-div{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted);font-size:.74rem}
+.auth-div::before,.auth-div::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.auth-input{width:100%;padding:12px 14px;background:var(--sur2);border:1px solid var(--bdr);border-radius:8px;
+  color:var(--white);font-family:var(--font);font-size:.88rem;outline:none;margin-bottom:10px;transition:border-color .2s}
+.auth-input::placeholder{color:var(--muted)}
+.auth-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,230,118,.06)}
+.btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,var(--green),#00b85a);
+  border:none;border-radius:8px;color:var(--bg);font-family:var(--display);font-size:.88rem;
+  font-weight:700;cursor:pointer;transition:all .22s;letter-spacing:.02em}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:var(--glow-g)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.auth-switch{text-align:center;margin-top:18px;font-size:.83rem;color:var(--muted)}
+.auth-switch a{color:var(--green);text-decoration:none;cursor:pointer;font-weight:400}
+.auth-switch a:hover{text-decoration:underline}
+.auth-back{text-align:center;margin-top:16px}
+.auth-back a{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-decoration:none;letter-spacing:.1em;text-transform:uppercase}
+.auth-back a:hover{color:var(--amber)}
+
+/* APP */
+#app{display:none;height:100vh;flex-direction:row;position:relative;z-index:1}
+#app.show{display:flex}
+
+/* SIDEBAR */
+.sidebar{width:268px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:transform .3s;position:relative;z-index:2}
+.sb-head{padding:20px 16px 16px;border-bottom:1px solid var(--bdr)}
+.sb-logo{font-family:var(--display);font-size:1.15rem;font-weight:800;background:linear-gradient(135deg,var(--green),var(--amber));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px}
+.sb-btn{width:100%;padding:10px 14px;border-radius:8px;font-family:var(--font);font-size:.83rem;
+  font-weight:400;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .2s;border:1px solid}
+.sb-btn-new{background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.25);color:var(--green);margin-bottom:8px}
+.sb-btn-new:hover{background:rgba(0,230,118,.16);border-color:rgba(0,230,118,.4)}
+.sb-btn-incog{background:rgba(249,113,113,.06);border-color:rgba(249,113,113,.2);color:#f87171}
+.sb-btn-incog:hover{background:rgba(249,113,113,.12)}
+.sb-section{padding:12px 14px 5px;font-family:var(--mono);font-size:.62rem;font-weight:700;
+  color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+.chat-list{flex:1;overflow-y:auto;padding:5px 8px}
+.chat-item{padding:9px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;
+  gap:9px;font-size:.82rem;color:var(--muted);transition:all .15s;margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;border:1px solid transparent}
+.chat-item:hover{background:var(--surface);color:var(--white);border-color:var(--bdr)}
+.chat-item.active{background:rgba(0,230,118,.08);color:var(--green);border-color:rgba(0,230,118,.2)}
+.chat-item-txt{overflow:hidden;text-overflow:ellipsis;flex:1;font-size:.8rem}
+.chat-del{opacity:0;font-size:.72rem;color:var(--muted);background:none;border:none;
+  cursor:pointer;padding:2px 5px;border-radius:4px;flex-shrink:0;transition:all .15s}
+.chat-item:hover .chat-del{opacity:1}
+.chat-del:hover{color:#f87171;background:rgba(249,113,113,.1)}
+.sb-foot{padding:12px 14px;border-top:1px solid var(--bdr)}
+.user-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;transition:background .2s;border:1px solid transparent}
+.user-row:hover{background:var(--surface);border-color:var(--bdr)}
+.user-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--amber));
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:.85rem;
+  font-weight:700;color:var(--bg);flex-shrink:0;overflow:hidden;border:1px solid var(--bdr)}
+.user-av img{width:100%;height:100%;object-fit:cover}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:.83rem;font-weight:500;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-email{font-family:var(--mono);font-size:.62rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.03em}
+.btn-signout{background:none;border:1px solid transparent;cursor:pointer;color:var(--muted);
+  padding:6px;border-radius:6px;transition:all .2s;flex-shrink:0}
+.btn-signout:hover{color:#f87171;border-color:rgba(249,113,113,.3);background:rgba(249,113,113,.06)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;position:relative}
+
+/* TOPBAR */
+.topbar{padding:14px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;
+  justify-content:space-between;background:rgba(7,9,13,.9);backdrop-filter:blur(20px);flex-shrink:0;
+  position:relative;z-index:5}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.btn-sb-toggle{background:none;border:1px solid var(--bdr);cursor:pointer;color:var(--muted);
+  padding:7px;border-radius:7px;display:none;transition:all .2s;flex-shrink:0}
+.btn-sb-toggle:hover{color:var(--green);border-color:var(--green)}
+.topbar-title{font-family:var(--display);font-size:.95rem;font-weight:700;color:var(--white);
+  max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.incog-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(249,113,113,.08);
+  border:1px solid rgba(249,113,113,.25);color:#f87171;padding:3px 10px;border-radius:20px;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;flex-shrink:0}
+.mode-tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--bdr);border-radius:8px;padding:3px}
+.mode-tab{padding:6px 14px;border-radius:6px;font-family:var(--mono);font-size:.68rem;font-weight:400;
+  cursor:pointer;border:none;background:none;color:var(--muted);transition:all .15s;
+  display:flex;align-items:center;gap:5px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.mode-tab.active{background:rgba(0,230,118,.12);color:var(--green);box-shadow:inset 0 0 0 1px rgba(0,230,118,.2)}
+.mode-tab:hover:not(.active){color:var(--white)}
+
+/* CHAT AREA */
+.chat-area{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px;position:relative}
+
+/* WELCOME */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex:1;text-align:center;padding:30px 16px;min-height:100%;animation:fadeUp .5s ease}
+.welcome-logo{font-family:var(--display);font-size:3rem;font-weight:800;
+  background:linear-gradient(135deg,var(--green),var(--amber));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:10px;letter-spacing:-.03em}
+.welcome-sub{font-size:.95rem;color:var(--muted);margin-bottom:40px;font-weight:300}
+.suggestion-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:600px}
+.sug-card{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--radius);
+  padding:16px;cursor:pointer;text-align:left;transition:all .22s;position:relative;overflow:hidden}
+.sug-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,230,118,.07),transparent 60%);opacity:0;transition:opacity .3s}
+.sug-card:hover{border-color:rgba(0,230,118,.3);transform:translateY(-2px);box-shadow:var(--glow-g)}
+.sug-card:hover::before{opacity:1}
+.sug-icon{font-size:1.3rem;margin-bottom:8px}
+.sug-title{font-family:var(--display);font-size:.84rem;font-weight:600;color:var(--white);margin-bottom:3px}
+.sug-desc{font-size:.74rem;color:var(--muted);line-height:1.5}
+
+/* MESSAGES */
+.message{display:flex;gap:12px;max-width:820px;width:100%;margin:0 auto;animation:fadeUp .3s ease}
+.message.user{flex-direction:row-reverse}
+.msg-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--display);font-size:.72rem;font-weight:700;margin-top:2px}
+.message.user .msg-av{background:linear-gradient(135deg,var(--amber),#c8880a);color:var(--bg)}
+.message.ai .msg-av{background:linear-gradient(135deg,var(--green),#009944);color:var(--bg);font-size:.6rem}
+.msg-bubble{flex:1;max-width:calc(100% - 44px)}
+.message.user .msg-bubble{display:flex;flex-direction:column;align-items:flex-end}
+.msg-content{padding:12px 16px;border-radius:14px;font-size:.9rem;line-height:1.7;max-width:100%;word-break:break-word}
+.message.user .msg-content{background:linear-gradient(135deg,var(--amber),#d4880a);color:var(--bg);border-bottom-right-radius:4px;font-weight:400}
+.message.ai .msg-content{background:var(--surface);border:1px solid var(--bdr);color:var(--white);border-bottom-left-radius:4px}
+.msg-content h1,.msg-content h2,.msg-content h3{color:var(--green);margin:12px 0 6px;font-family:var(--display);font-weight:700}
+.msg-content h1{font-size:1.15rem}.msg-content h2{font-size:1rem}.msg-content h3{font-size:.92rem}
+.msg-content p{margin-bottom:8px}.msg-content p:last-child{margin-bottom:0}
+.msg-content ul,.msg-content ol{padding-left:20px;margin-bottom:8px}
+.msg-content li{margin-bottom:3px}
+.msg-content code{font-family:var(--mono);font-size:.78rem;background:rgba(0,230,118,.1);color:var(--green);padding:2px 6px;border-radius:4px}
+.msg-content pre{background:#080c10;border:1px solid var(--bdr);border-radius:8px;margin:10px 0;overflow-x:auto;position:relative}
+.msg-content pre code{background:none;color:inherit;padding:14px 16px;display:block;font-size:.78rem;line-height:1.6}
+.code-copy{position:absolute;top:8px;right:8px;background:var(--sur2);border:1px solid var(--bdr);
+  color:var(--muted);font-family:var(--mono);font-size:.66rem;padding:3px 9px;border-radius:5px;cursor:pointer;transition:all .2s}
+.code-copy:hover{color:var(--green);border-color:var(--green)}
+.msg-content blockquote{border-left:2px solid var(--green);padding-left:12px;color:var(--muted);margin:8px 0;font-style:italic}
+.msg-content strong{color:var(--green);font-weight:500}
+.msg-content a{color:var(--amber);text-decoration:none}.msg-content a:hover{text-decoration:underline}
+.msg-content table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.83rem}
+.msg-content th,.msg-content td{border:1px solid var(--bdr);padding:7px 12px;text-align:left}
+.msg-content th{background:var(--sur2);color:var(--green);font-family:var(--mono);font-size:.72rem;letter-spacing:.06em}
+.msg-actions{display:flex;gap:5px;margin-top:6px;opacity:0;transition:opacity .2s}
+.message:hover .msg-actions{opacity:1}
+.msg-act-btn{background:none;border:1px solid var(--bdr);color:var(--muted);font-family:var(--mono);
+  font-size:.65rem;padding:3px 10px;border-radius:20px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.msg-act-btn:hover{color:var(--green);border-color:var(--green)}
+.msg-img{max-width:100%;border-radius:var(--radius);border:1px solid var(--bdr);margin-top:8px;
+  display:block;max-height:400px;object-fit:contain;cursor:zoom-in;transition:transform .2s}
+.msg-img:hover{transform:scale(1.01)}
+.img-loading-wrap{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--radius);
+  padding:20px;display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.84rem}
+.img-spin{width:18px;height:18px;border:2px solid var(--bdr);border-top-color:var(--green);
+  border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+
+/* TYPING */
+.typing-dots{display:flex;gap:4px;padding:13px 16px;background:var(--surface);border:1px solid var(--bdr);
+  border-radius:14px;border-bottom-left-radius:4px;width:fit-content}
+.t-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+.t-dot:nth-child(2){animation-delay:.2s}.t-dot:nth-child(3){animation-delay:.4s}
+
+/* INPUT */
+.input-area{padding:14px 20px 18px;background:rgba(7,9,13,.95);border-top:1px solid var(--bdr);flex-shrink:0;position:relative;z-index:4}
+.input-wrap{max-width:820px;margin:0 auto}
+.input-box{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;
+  transition:border-color .2s,box-shadow .2s}
+.input-box:focus-within{border-color:rgba(0,230,118,.4);box-shadow:0 0 0 3px rgba(0,230,118,.06)}
+.input-toolbar{display:flex;align-items:center;gap:3px;padding:8px 12px 0;flex-wrap:wrap}
+.tool-btn{background:none;border:1px solid transparent;color:var(--muted);font-family:var(--mono);
+  font-size:.66rem;padding:5px 10px;border-radius:6px;cursor:pointer;display:flex;align-items:center;
+  gap:4px;transition:all .15s;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.tool-btn:hover{color:var(--green);border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.06)}
+.tool-btn.active{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.08)}
+.img-opts{display:none;align-items:center;gap:8px;padding:7px 12px 0;flex-wrap:wrap}
+.img-opts.show{display:flex}
+.img-label{font-family:var(--mono);font-size:.66rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.img-select{background:var(--sur2);border:1px solid var(--bdr);color:var(--white);font-family:var(--font);
+  font-size:.8rem;padding:5px 10px;border-radius:6px;outline:none;cursor:pointer;transition:border-color .2s}
+.img-select:focus{border-color:var(--green)}
+.input-row{display:flex;align-items:flex-end;gap:10px;padding:8px 12px}
+#chatInput{flex:1;background:none;border:none;outline:none;color:var(--white);font-family:var(--font);
+  font-size:.9rem;resize:none;min-height:24px;max-height:150px;line-height:1.55;padding:2px 0}
+#chatInput::placeholder{color:var(--dim)}
+.btn-send{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--green),#00b85a);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .22s}
+.btn-send:hover{transform:scale(1.05);box-shadow:var(--glow-g)}
+.btn-send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-send svg{width:15px;height:15px;fill:var(--bg)}
+.input-hint{text-align:center;font-family:var(--mono);font-size:.62rem;color:var(--dim);
+  margin-top:8px;letter-spacing:.06em}
+
+/* FILE UPLOAD */
+.attach-btn{background:none;border:1px solid transparent;color:var(--muted);padding:5px 8px;
+  border-radius:6px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.attach-btn:hover{color:var(--amber);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.06)}
+#fileInput{display:none}
+.file-preview{display:flex;flex-wrap:wrap;gap:8px;padding:8px 12px 0}
+.file-chip{display:flex;align-items:center;gap:7px;background:var(--sur2);
+  border:1px solid var(--bdr-a);border-radius:6px;padding:5px 10px;font-size:.75rem;
+  color:var(--amber);font-family:var(--mono);letter-spacing:.04em;max-width:220px}
+.file-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.file-chip-rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;
+  padding:0;line-height:1;transition:color .15s;flex-shrink:0}
+.file-chip-rm:hover{color:#f87171}
+.msg-file-img{max-width:260px;max-height:200px;border-radius:8px;border:1px solid var(--bdr);
+  display:block;margin-bottom:8px;cursor:zoom-in}
+.msg-file-doc{display:flex;align-items:center;gap:8px;background:rgba(245,166,35,.07);
+  border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:10px 14px;margin-bottom:8px;
+  font-family:var(--mono);font-size:.75rem;color:var(--amber)}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;
+  align-items:center;justify-content:center;cursor:zoom-out}
+.lightbox.show{display:flex}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:var(--radius);box-shadow:0 0 60px rgba(0,0,0,.5)}
+
+/* OVERLAY */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:98}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--sur2);
+  border:1px solid var(--bdr);color:var(--white);padding:9px 18px;border-radius:20px;
+  font-family:var(--mono);font-size:.75rem;z-index:9998;opacity:0;transition:opacity .3s;
+  pointer-events:none;white-space:nowrap;letter-spacing:.04em}
+.toast.show{opacity:1}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:99;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sb-overlay.show{display:block}
+  .btn-sb-toggle{display:flex}
+  .mode-tabs{display:none}
+  .suggestion-grid{grid-template-columns:1fr}
+  .auth-card{padding:32px 24px}
+  #chatInput{font-size:16px}
+}
+@media(max-width:480px){
+  .auth-card{padding:28px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- URL SANITISER: runs first, before Supabase loads, strips OAuth errors that crash the page -->
+<script>
+(function(){
+  try{
+    var search = window.location.search;
+    var hash = window.location.hash;
+    // If URL has OAuth error or any Supabase callback params, wipe them immediately
+    if(search.includes('error=') || search.includes('code=') || hash.includes('access_token') || hash.includes('error=')){
+      var clean = window.location.pathname;
+      window.history.replaceState(null, '', clean);
+      // Store the error so init() can show a message after page loads
+      if(search.includes('error=') || hash.includes('error=')){
+        window._oauthError = true;
+      }
+    }
+  }catch(e){}
+})();
+</script>
+
+<!-- MATRIX CANVAS -->
+<canvas id="matrix" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4"></canvas>
+
+<!-- LOADING -->
+<div id="appLoading">
+  <div class="load-logo">DPRINCE AI</div>
+  <div class="load-spinner" id="loadSpinner"></div>
+  <div class="load-sub" id="loadStatus">Initialising...</div>
+  <div id="loadSkip" style="display:none;margin-top:18px;text-align:center">
+    <div style="font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">SLOW CONNECTION DETECTED</div>
+    <button onclick="forceShowAuth()" style="padding:9px 22px;background:transparent;border:1px solid rgba(0,230,118,0.35);border-radius:8px;color:var(--green);font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(0,230,118,0.08)'" onmouseout="this.style.background='transparent'">CONTINUE ANYWAY →</button>
+  </div>
+</div>
+
+<!-- NUCLEAR FALLBACK: pure JS timeout runs immediately when page parses this tag -->
+<script>
+(function(){
+  // This runs the moment the browser parses this tag — no waiting for external scripts
+  var _skipShown = false;
+  function _showSkip(){
+    if(_skipShown) return;
+    _skipShown = true;
+    var sk = document.getElementById('loadSkip');
+    if(sk) sk.style.display = 'block';
+    var st = document.getElementById('loadStatus');
+    if(st) st.textContent = 'Slow connection detected...';
+  }
+  function _forceAuth(){
+    // Hide loading, show auth elements directly without any Supabase dependency
+    var ld = document.getElementById('appLoading');
+    if(ld) ld.style.display = 'none';
+    var au = document.getElementById('authScreen');
+    if(au) au.style.display = 'flex';
+  }
+  window.forceShowAuth = _forceAuth;
+  // Show skip button at 2s
+  setTimeout(_showSkip, 2000);
+  // AUTO-continue at 4s — don't make user click, just go straight to auth
+  setTimeout(function(){
+    var ld = document.getElementById('appLoading');
+    if(ld && ld.style.display !== 'none') _forceAuth();
+  }, 4000);
+})();
+</script>
+
+<!-- AUTH -->
+<div id="authScreen" style="display:flex">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <span class="auth-logo-name">DPRINCE AI</span>
+        <span class="auth-logo-tag">Think &nbsp;·&nbsp; Create &nbsp;·&nbsp; Explore</span>
+      </div>
+      <div id="authTitle" class="auth-title">Welcome back</div>
+      <div id="authSub" class="auth-sub">Sign in to continue your conversations</div>
+      <div class="auth-err" id="authErr"></div>
+
+      <button class="btn-google" onclick="signInGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-div">or</div>
+
+      <input class="auth-input" type="text" id="aName" placeholder="Full name" style="display:none">
+      <input class="auth-input" type="email" id="aEmail" placeholder="Email address">
+      <input class="auth-input" type="password" id="aPass" placeholder="Password">
+      <button class="btn-primary" id="aBtn" onclick="handleAuth()">Sign In</button>
+
+      <div class="auth-switch" id="aSwitch">
+        Don't have an account? <a onclick="toggleMode()">Sign up free</a>
+      </div>
+      <div class="auth-back">
+        <a href="https://mrwale.vercel.app" target="_blank">← Back to Mr. Wale's Portfolio</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSb()"></div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">DPRINCE AI</div>
+      <button class="sb-btn sb-btn-new" onclick="newChat()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Chat
+      </button>
+      <button class="sb-btn sb-btn-incog" onclick="toggleIncog()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        Incognito Chat
+      </button>
+    </div>
+    <div class="sb-section">Recent Chats</div>
+    <div class="chat-list" id="chatList">
+      <div style="padding:18px 10px;color:var(--dim);font-size:.78rem;text-align:center;font-family:var(--mono)">No chats yet</div>
+    </div>
+    <div class="sb-foot">
+      <div class="user-row">
+        <div class="user-av" id="userAv">?</div>
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-email" id="userEmail"></div>
+        </div>
+        <button class="btn-signout" onclick="doSignOut()" title="Sign out">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="btn-sb-toggle" onclick="toggleSb()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-title" id="topTitle">DPRINCE AI</div>
+        <div id="incogPill" style="display:none" class="incog-pill">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="1" y1="1" x2="23" y2="23"/><circle cx="12" cy="12" r="3"/></svg>
+          Incognito
+        </div>
+      </div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-m="chat" onclick="setMode('chat')">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat
+        </button>
+        <button class="mode-tab" data-m="image" onclick="setMode('image')">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Image
+        </button>
+        <button class="mode-tab" data-m="code" onclick="setMode('code')">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Code
+        </button>
+        <button class="mode-tab" data-m="voice" onclick="setMode('voice')">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>Voice
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-area" id="chatArea">
+      <div class="welcome" id="welcomeEl">
+        <div class="welcome-logo">DPRINCE AI</div>
+        <div class="welcome-sub">Your intelligent assistant for chat, code, images and voice</div>
+        <div class="suggestion-grid">
+          <div class="suggestion-card sug-card" onclick="qs('What are the latest trends in Web3 security and blockchain in 2025?')">
+            <div class="sug-icon">⛓️</div>
+            <div class="sug-title">Latest Web3 Trends</div>
+            <div class="sug-desc">Up-to-date blockchain & security insights</div>
+          </div>
+          <div class="suggestion-card sug-card" onclick="qs('Write a Solidity smart contract for a basic ERC-20 token with security best practices')">
+            <div class="sug-icon">📝</div>
+            <div class="sug-title">Write Smart Contract</div>
+            <div class="sug-desc">Solidity code with security best practices</div>
+          </div>
+          <div class="suggestion-card sug-card" onclick="switchImgMode()">
+            <div class="sug-icon">🎨</div>
+            <div class="sug-title">Generate an Image</div>
+            <div class="sug-desc">Create images from text descriptions</div>
+          </div>
+          <div class="suggestion-card sug-card" onclick="qs('Write a professional cover letter for a Web3 security specialist role')">
+            <div class="sug-icon">✍️</div>
+            <div class="sug-title">Write for Me</div>
+            <div class="sug-desc">Letters, essays, bios and more</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap">
+        <div class="input-box">
+          <div class="input-toolbar">
+            <button class="tool-btn active" id="tChat" onclick="setMode('chat')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat
+            </button>
+            <button class="tool-btn" id="tImage" onclick="setMode('image')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Image
+            </button>
+            <button class="tool-btn" id="tCode" onclick="setMode('code')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Code
+            </button>
+            <button class="tool-btn" id="tVoice" onclick="setMode('voice')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>Voice
+            </button>
+            <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Attach image or document">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              Attach
+            </button>
+            <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.doc,.docx,.csv,.js,.py,.html,.css,.json,.md" multiple onchange="handleFiles(this.files)">
+          </div>
+          <!-- File preview chips -->
+          <div class="file-preview" id="filePreview"></div>
+          <div class="img-opts" id="imgOpts">
+            <span class="img-label">Style:</span>
+            <select class="img-select" id="imgStyle">
+              <option value="">Default</option>
+              <option value="photorealistic, ultra detailed">Photorealistic</option>
+              <option value="digital art, vibrant colors">Digital Art</option>
+              <option value="anime style, studio ghibli">Anime</option>
+              <option value="oil painting, impressionist">Oil Painting</option>
+              <option value="watercolor, soft tones">Watercolor</option>
+              <option value="3d render, octane render">3D Render</option>
+              <option value="cinematic, dramatic lighting">Cinematic</option>
+              <option value="dark fantasy, mystical">Dark Fantasy</option>
+            </select>
+            <span class="img-label">Size:</span>
+            <select class="img-select" id="imgSize">
+              <option value="512x512">Square</option>
+              <option value="1024x512">Wide</option>
+              <option value="512x1024">Tall</option>
+              <option value="1024x1024">Large</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <textarea id="chatInput" placeholder="Ask anything... (Enter to send, Shift+Enter for new line)" rows="1"
+              onkeydown="handleKey(event)" oninput="resize(this)"></textarea>
+            <button class="btn-send" id="sendBtn" onclick="handleSend()" title="Send message">
+              <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="input-hint">DPRINCE AI · Powered by Llama 3.3 &amp; Groq · Enter to send</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLb()">
+  <img id="lbImg" src="" alt="">
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const SUPA_URL = 'https://gudrngqoidmaaepqifwu.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1ZHJuZ3FvaWRtYWFlcHFpZnd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTcwMTksImV4cCI6MjA4OTU3MzAxOX0._FVO2PG0eEYS2wiGjOjjDv6ebt4FwcyyGKD-4YCeFH4';
+const GROQ_KEY = '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';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MDL = 'llama-3.3-70b-versatile';
+
+// Supabase stub — used if CDN fails or times out
+function makeSbStub(){
+  return {
+    auth:{
+      getSession:()=>Promise.resolve({data:{session:null},error:null}),
+      signInWithOAuth:()=>Promise.resolve({error:{message:'Auth service unavailable. Check connection.'}}),
+      signInWithPassword:()=>Promise.resolve({error:{message:'Auth service unavailable. Check connection.'}}),
+      signUp:()=>Promise.resolve({error:{message:'Auth service unavailable. Check connection.'}}),
+      signOut:()=>Promise.resolve({}),
+      onAuthStateChange:()=>({data:{subscription:{unsubscribe:()=>{}}}})
+    },
+    from:()=>({
+      select:()=>({eq:()=>({order:()=>({limit:()=>Promise.resolve({data:[],error:null})})})}),
+      insert:()=>({select:()=>({single:()=>Promise.resolve({data:null,error:{message:'DB unavailable'}})})}),
+      update:()=>({eq:()=>Promise.resolve({data:null,error:null})}),
+      delete:()=>({eq:()=>Promise.resolve({data:null,error:null})})
+    })
+  };
+}
+
+let sb = makeSbStub(); // default to stub; real one replaces it after async load
+let sbReady = false;
+let sbReady = false; // true once real Supabase is loaded
+
+// ── STATE ─────────────────────────────────────────────────────
+let user=null, chatId=null, msgs=[], chats=[];
+let incog=false, mode='chat', busy=false, isSignup=false;
+let attachedFiles=[]; // stores {name, type, dataUrl, text}
+
+// ── MATRIX RAIN ───────────────────────────────────────────────
+(function(){
+  const c=document.getElementById('matrix');
+  const ctx=c.getContext('2d');
+  const chars='アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF<>{}[]'.split('');
+  let cols,drops;
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;cols=Math.floor(c.width/14);drops=drops&&drops.length===cols?drops:Array.from({length:cols},()=>Math.random()*-50)}
+  function draw(){
+    ctx.fillStyle='rgba(7,9,13,0.18)';ctx.fillRect(0,0,c.width,c.height);
+    ctx.font='13px monospace';
+    for(let i=0;i<drops.length;i++){
+      const ch=chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillStyle=Math.random()>.97?'rgba(0,230,118,0.5)':'rgba(0,230,118,0.09)';
+      ctx.fillText(ch,i*14,drops[i]*14);
+      if(drops[i]*14>c.height&&Math.random()>.975)drops[i]=0;
+      drops[i]+=0.35;
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize,{passive:true});
+  resize();draw();
+})();
+
+// ── INIT ──────────────────────────────────────────────────────
+function setLoadStatus(msg){const el=document.getElementById('loadStatus');if(el)el.textContent=msg;}
+
+function withTimeout(promise,ms){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),ms))
+  ]);
+}
+
+async function init(){
+  // URL was already cleaned by the inline sanitiser at top of body
+  // Check if there was an OAuth error
+  if(window._oauthError){
+    window._oauthError=false;
+    showAuth();
+    setTimeout(()=>setAuthErr('Sign-in link expired or was cancelled. Please try again.'),200);
+    sb.auth.onAuthStateChange(async(e,session)=>{
+      if(session?.user&&!user){user=session.user;await showApp();}
+      else if(!session?.user&&user){user=null;showAuth();}
+    });
+    return;
+  }
+
+  const skipTimer=setTimeout(()=>{
+    const sk=document.getElementById('loadSkip');
+    if(sk&&document.getElementById('appLoading').style.display!=='none')sk.style.display='block';
+  },2000);
+  const clearSkip=()=>clearTimeout(skipTimer);
+  const statusMsgs=['Initialising...','Connecting...','Checking session...','Almost ready...'];
+  let mi=0;
+  const statusInterval=setInterval(()=>{mi=(mi+1)%statusMsgs.length;setLoadStatus(statusMsgs[mi]);},1200);
+  const clearAll=()=>{clearSkip();clearInterval(statusInterval);};
+
+  try{
+    // Handle successful OAuth callback
+    const hash=window.location.hash;
+    if(oauthCode||hash.includes('access_token')){
+      setLoadStatus('Signing you in...');
+      const{data}=await withTimeout(sb.auth.getSession(),5000);
+      if(data?.session?.user){
+        clearAll();
+        user=data.session.user;
+        await showApp();return;
+      }
+    }
+    // Normal session check
+    const{data}=await withTimeout(sb.auth.getSession(),1500);
+    clearAll();
+    if(data?.session?.user){user=data.session.user;await showApp();}
+    else showAuth();
+  }catch(e){
+    clearAll();
+    console.warn('Session check failed:',e.message);
+    showAuth();
+  }
+
+  sb.auth.onAuthStateChange(async(e,session)=>{
+    if(session?.user&&!user){user=session.user;await showApp();}
+    else if(!session?.user&&user){user=null;showAuth();}
+  });
+}
+
+function showAuth(){
+  document.getElementById('appLoading').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+  document.getElementById('app').classList.remove('show');
+}
+
+async function showApp(){
+  document.getElementById('appLoading').style.display='none';
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('app').classList.add('show');
+  updateUserUI();
+  await loadChats();
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function signInGoogle(){
+  setAuthErr('');
+  const btn=document.querySelector('.btn-google');
+  const originalHTML=btn.innerHTML;
+  btn.innerHTML='<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>Connecting to Google...';
+  btn.disabled=true;
+
+  // Wait for real Supabase if still loading
+  if(!sbReady){
+    let waited=0;
+    while(!sbReady&&waited<10000){await new Promise(r=>setTimeout(r,300));waited+=300;}
+    if(!sbReady){
+      btn.innerHTML=originalHTML;btn.disabled=false;
+      setAuthErr('Auth service failed to load. Please refresh and try again.');return;
+    }
+  }
+
+  const redirectTo='https://dprince-ai.vercel.app';
+  const{error}=await sb.auth.signInWithOAuth({
+    provider:'google',
+    options:{
+      redirectTo,
+      queryParams:{access_type:'offline',prompt:'select_account'}
+    }
+  });
+
+  if(error){
+    btn.disabled=false;
+    btn.innerHTML=originalHTML;
+    if(error.message.includes('provider is not enabled')||error.message.includes('not enabled')){
+      setAuthErr('Google sign-in is not yet configured. Please use email/password below, or contact the admin.');
+    } else {
+      setAuthErr('Google sign-in failed: '+error.message);
+    }
+  }
+  // If no error, browser redirects to Google — no need to re-enable button
+}
+
+async function handleAuth(){
+  const email=document.getElementById('aEmail').value.trim();
+  const pass=document.getElementById('aPass').value;
+  const name=document.getElementById('aName').value.trim();
+  const btn=document.getElementById('aBtn');
+  if(!email||!pass){setAuthErr('Please enter your email and password.');return;}
+  if(isSignup&&!name){setAuthErr('Please enter your full name.');return;}
+  btn.disabled=true;
+  setAuthErr('');
+
+  // If Supabase is still loading, wait up to 10s for it
+  if(!sbReady){
+    btn.textContent='Connecting to auth...';
+    let waited=0;
+    while(!sbReady&&waited<10000){
+      await new Promise(r=>setTimeout(r,300));
+      waited+=300;
+    }
+    if(!sbReady){
+      btn.disabled=false;btn.textContent=isSignup?'Create Account':'Sign In';
+      setAuthErr('Auth service failed to load. Please refresh the page and try again.');
+      return;
+    }
+  }
+
+  let secs=20;
+  btn.textContent=(isSignup?'Creating account':'Signing in')+' ('+secs+'s)...';
+  const cd=setInterval(()=>{secs--;if(secs>0)btn.textContent=(isSignup?'Creating account':'Signing in')+' ('+secs+'s)...';},1000);
+  const clearBtn=(label)=>{clearInterval(cd);btn.disabled=false;btn.textContent=label||(isSignup?'Create Account':'Sign In');};
+
+  try{
+    const timeout=new Promise((_,r)=>setTimeout(()=>r(new Error('Request timed out. Please try again.')),20000));
+    if(isSignup){
+      const r=await Promise.race([sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}}),timeout]);
+      if(r.error){clearBtn();setAuthErr(r.error.message);}
+      else{clearBtn('Account Created!');showToast('Account created! Welcome to DPRINCE AI.');}
+    }else{
+      const r=await Promise.race([sb.auth.signInWithPassword({email,password:pass}),timeout]);
+      if(r.error){clearBtn();setAuthErr(r.error.message);}
+      else clearBtn('Signed In!');
+    }
+  }catch(e){
+    clearBtn();
+    setAuthErr(e.message||'Connection failed. Check your internet and try again.');
+  }
+}
+
+function toggleMode(){
+  isSignup=!isSignup;
+  document.getElementById('authTitle').textContent=isSignup?'Create account':'Welcome back';
+  document.getElementById('authSub').textContent=isSignup?'Join DPRINCE AI for free':'Sign in to continue';
+  document.getElementById('aName').style.display=isSignup?'block':'none';
+  document.getElementById('aBtn').textContent=isSignup?'Create Account':'Sign In';
+  document.getElementById('aSwitch').innerHTML=isSignup
+    ?'Already have an account? <a onclick="toggleMode()">Sign in</a>'
+    :'Don\'t have an account? <a onclick="toggleMode()">Sign up free</a>';
+  setAuthErr('');
+}
+
+async function doSignOut(){
+  await sb.auth.signOut();
+  user=null;chatId=null;msgs=[];chats=[];
+  showToast('Signed out successfully.');
+  showAuth();
+}
+
+function setAuthErr(m){const e=document.getElementById('authErr');e.textContent=m;e.classList.toggle('show',!!m);}
+
+// ── USER UI ───────────────────────────────────────────────────
+function updateUserUI(){
+  if(!user)return;
+  const name=user.user_metadata?.full_name||user.user_metadata?.name||user.email?.split('@')[0]||'User';
+  const photo=user.user_metadata?.avatar_url||user.user_metadata?.picture||'';
+  document.getElementById('userName').textContent=name;
+  document.getElementById('userEmail').textContent=user.email||'';
+  const av=document.getElementById('userAv');
+  av.innerHTML=photo?`<img src="${photo}" alt="${name}">`:(name[0]||'U').toUpperCase();
+}
+
+// ── CHATS ─────────────────────────────────────────────────────
+async function loadChats(){
+  if(!user||incog)return;
+  const{data,error}=await sb.from('dp_chats').select('id,title,updated_at')
+    .eq('user_id',user.id).order('updated_at',{ascending:false}).limit(50);
+  if(error){if(error.code==='42P01')printSQL();return;}
+  chats=data||[];renderChats();
+}
+
+function renderChats(){
+  const el=document.getElementById('chatList');
+  if(!chats.length){el.innerHTML='<div style="padding:18px 10px;color:var(--dim);font-size:.78rem;text-align:center;font-family:var(--mono)">No chats yet</div>';return;}
+  el.innerHTML=chats.map(c=>`
+    <div class="chat-item${c.id===chatId?' active':''}" onclick="loadChat('${c.id}')">
+      <span style="font-size:.85rem;flex-shrink:0">💬</span>
+      <span class="chat-item-txt">${esc(c.title||'Untitled')}</span>
+      <button class="chat-del" onclick="event.stopPropagation();delChat('${c.id}')">✕</button>
+    </div>`).join('');
+}
+
+async function loadChat(id){
+  chatId=id;
+  const{data,error}=await sb.from('dp_messages').select('role,content').eq('chat_id',id).order('created_at',{ascending:true});
+  if(error){showToast('Could not load chat.');return;}
+  msgs=data.map(m=>({role:m.role,content:m.content}));
+  renderChats();renderMsgs();
+  const c=chats.find(x=>x.id===id);
+  document.getElementById('topTitle').textContent=c?.title||'Chat';
+  closeSb();
+}
+
+async function delChat(id){
+  await sb.from('dp_messages').delete().eq('chat_id',id);
+  await sb.from('dp_chats').delete().eq('id',id);
+  if(chatId===id){chatId=null;msgs=[];showWelcome();document.getElementById('topTitle').textContent='DPRINCE AI';}
+  chats=chats.filter(c=>c.id!==id);renderChats();showToast('Chat deleted.');
+}
+
+function newChat(){chatId=null;msgs=[];incog=false;document.getElementById('incogPill').style.display='none';showWelcome();document.getElementById('topTitle').textContent='DPRINCE AI';renderChats();closeSb();}
+
+function toggleIncog(){
+  incog=!incog;chatId=null;msgs=[];
+  document.getElementById('incogPill').style.display=incog?'flex':'none';
+  showWelcome();
+  document.getElementById('topTitle').textContent=incog?'Incognito Chat':'DPRINCE AI';
+  showToast(incog?'Incognito on. Nothing will be saved.':'Incognito off.');
+  closeSb();
+}
+
+async function saveToDb(userMsg,aiMsg){
+  if(incog||!user)return;
+  try{
+    if(!chatId){
+      const title=userMsg.substring(0,55)+(userMsg.length>55?'...':'');
+      const{data,error}=await sb.from('dp_chats').insert({user_id:user.id,title,updated_at:new Date().toISOString()}).select('id').single();
+      if(error){if(error.code==='42P01')printSQL();return;}
+      chatId=data.id;
+    }else{await sb.from('dp_chats').update({updated_at:new Date().toISOString()}).eq('id',chatId);}
+    await sb.from('dp_messages').insert([{chat_id:chatId,role:'user',content:userMsg},{chat_id:chatId,role:'assistant',content:aiMsg}]);
+    await loadChats();
+  }catch(e){console.warn('DB error:',e);}
+}
+
+function printSQL(){
+  console.log('%cRun this SQL in Supabase:\n\ncreate table if not exists dp_chats (id uuid default gen_random_uuid() primary key, user_id uuid references auth.users(id) on delete cascade, title text, created_at timestamptz default now(), updated_at timestamptz default now());\ncreate table if not exists dp_messages (id uuid default gen_random_uuid() primary key, chat_id uuid references dp_chats(id) on delete cascade, role text not null, content text not null, created_at timestamptz default now());\nalter table dp_chats enable row level security;\nalter table dp_messages enable row level security;\ncreate policy "own" on dp_chats for all using (auth.uid()=user_id);\ncreate policy "own" on dp_messages for all using (chat_id in (select id from dp_chats where user_id=auth.uid()));','color:#00e676;font-size:11px');
+  showToast('Check browser console for database setup SQL.',5000);
+}
+
+// ── MODE ──────────────────────────────────────────────────────
+function setMode(m){
+  mode=m;
+  ['Chat','Image','Code','Voice'].forEach(n=>{
+    const b=document.getElementById('t'+n);if(b)b.classList.toggle('active',n.toLowerCase()===m);
+  });
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.m===m));
+  document.getElementById('imgOpts').classList.toggle('show',m==='image');
+  const ph={chat:'Ask anything... (Enter to send, Shift+Enter for new line)',image:'Describe the image you want to generate...',code:'Describe what code you want me to write...',voice:'Type a message and I will speak the response aloud...'};
+  document.getElementById('chatInput').placeholder=ph[m]||ph.chat;
+}
+
+function switchImgMode(){setMode('image');document.getElementById('chatInput').value='a futuristic African city with neon lights at night, digital art';document.getElementById('chatInput').focus();}
+
+// ── SEND ──────────────────────────────────────────────────────
+// ── FILE HANDLING ─────────────────────────────────────────────
+// Extract text from PDF using PDF.js (runs in browser, free)
+async function extractPDFText(file){
+  if(!window.pdfjsLib) return '[PDF.js not loaded — try refreshing the page]';
+  try{
+    const arrayBuffer=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+    let fullText='';
+    const maxPages=Math.min(pdf.numPages, 20); // read up to 20 pages
+    for(let i=1;i<=maxPages;i++){
+      const page=await pdf.getPage(i);
+      const tc=await page.getTextContent();
+      const pageText=tc.items.map(item=>item.str).join(' ');
+      fullText+='[Page '+i+']\n'+pageText+'\n\n';
+    }
+    if(pdf.numPages>20) fullText+='[...'+( pdf.numPages-20)+' more pages not shown...]';
+    return fullText.trim()||'[PDF appears to have no extractable text — may be a scanned image]';
+  }catch(e){
+    return '[PDF read error: '+e.message+']';
+  }
+}
+
+// Extract text from DOCX using Mammoth.js (runs in browser, free)
+async function extractDOCXText(file){
+  if(!window.mammoth) return '[Mammoth.js not loaded — try refreshing the page]';
+  try{
+    const arrayBuffer=await file.arrayBuffer();
+    const result=await mammoth.extractRawText({arrayBuffer});
+    const text=result.value||'';
+    return text.length>15000?text.substring(0,15000)+'\n\n[...truncated at 15,000 chars...]':text;
+  }catch(e){
+    return '[DOCX read error: '+e.message+']';
+  }
+}
+
+async function handleFiles(files){
+  for(const file of Array.from(files)){
+    if(attachedFiles.length>=3){showToast('Maximum 3 files at once.');break;}
+    const isImage=file.type.startsWith('image/');
+    const name=file.name;
+    const ext=name.split('.').pop().toLowerCase();
+    const entry={name,type:isImage?'image':'document'};
+
+    if(isImage){
+      // Read as dataURL for display + vision model
+      const dataUrl=await new Promise(res=>{
+        const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);
+      });
+      entry.dataUrl=dataUrl;
+      attachedFiles.push(entry);renderFilePreviews();
+    }else{
+      showToast('Reading '+name+'...');
+      if(ext==='pdf'){
+        entry.text=await extractPDFText(file);
+      }else if(ext==='docx'||ext==='doc'){
+        entry.text=await extractDOCXText(file);
+      }else{
+        // Plain text formats: txt, js, py, html, css, json, md, csv etc.
+        entry.text=await new Promise(res=>{
+          const r=new FileReader();
+          r.onload=e=>{
+            const raw=e.target.result;
+            res(raw.length>15000?raw.substring(0,15000)+'\n\n[...truncated at 15,000 chars...]':raw);
+          };
+          r.onerror=()=>res('[Could not read: '+name+']');
+          r.readAsText(file);
+        });
+      }
+      showToast('✓ '+name+' ready');
+      attachedFiles.push(entry);renderFilePreviews();
+    }
+  }
+  document.getElementById('fileInput').value='';
+}
+
+function renderFilePreviews(){
+  const el=document.getElementById('filePreview');
+  if(!attachedFiles.length){el.innerHTML='';return;}
+  el.innerHTML=attachedFiles.map((f,i)=>`
+    <div class="file-chip">
+      <span style="font-size:.9rem">${f.type==='image'?'IMAGE':'DOC'}</span>
+      <span class="file-chip-name">${f.name}</span>
+      <button class="file-chip-rm" onclick="removeFile(${i})">x</button>
+    </div>`).join('');
+}
+function removeFile(i){attachedFiles.splice(i,1);renderFilePreviews();}
+
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend();}
+}
+
+async function handleSend(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();
+  const hasFiles=attachedFiles.length>0;
+  if((!text&&!hasFiles)||busy)return;
+  inp.value='';resize(inp);
+  if(mode==='image'&&!hasFiles){await genImage(text);return;}
+  const filesToSend=attachedFiles.splice(0);
+  renderFilePreviews();
+  await sendMsg(text,filesToSend);
+}
+
+function qs(text){document.getElementById('chatInput').value=text;handleSend();}
+
+// Extract URLs from text
+function extractURLs(text){
+  const re=/https?:\/\/[^\s"'<>)]+/g;
+  return text.match(re)||[];
+}
+
+// Fetch page content via free CORS proxy
+async function fetchLinkContent(url){
+  const proxies=[
+    `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+    `https://corsproxy.io/?${encodeURIComponent(url)}`
+  ];
+  for(const proxy of proxies){
+    try{
+      const res=await Promise.race([
+        fetch(proxy),
+        new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),8000))
+      ]);
+      if(!res.ok)continue;
+      const data=await res.json().catch(()=>null);
+      // allorigins returns {contents: "..."}
+      const html=data?.contents||await res.text();
+      // Strip HTML tags, collapse whitespace, limit length
+      const text=html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'')
+                     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'')
+                     .replace(/<[^>]+>/g,' ')
+                     .replace(/\s+/g,' ')
+                     .trim()
+                     .substring(0,8000);
+      if(text.length>100)return text;
+    }catch(e){continue;}
+  }
+  return null;
+}
+
+// ── WEB SEARCH (free, no API key needed) ─────────────────────
+// Keywords that signal the user wants current/recent info
+const SEARCH_TRIGGERS = [
+  'news','today','tonight','last night','yesterday','this week','this month',
+  'latest','current','recent','now','happening','just happened','broke','breaking',
+  'score','result','match','election','weather','price','stock','crypto','bitcoin',
+  'who won','what happened','update','release','announced','launched','died','arrested'
+];
+
+function needsWebSearch(text){
+  const lower = text.toLowerCase();
+  // Always search if it contains a year near current or explicit time words
+  if(/(2024|2025|2026)/.test(lower)) return true;
+  return SEARCH_TRIGGERS.some(t => lower.includes(t));
+}
+
+async function webSearch(query){
+  const ddgUrl='https://api.allorigins.win/get?url='+encodeURIComponent('https://api.duckduckgo.com/?q='+encodeURIComponent(query)+'&format=json&no_html=1&skip_disambig=1');
+  const htmlUrl='https://api.allorigins.win/get?url='+encodeURIComponent('https://duckduckgo.com/html/?q='+encodeURIComponent(query));
+  let results='';
+  try{
+    const r=await Promise.race([fetch(ddgUrl),new Promise((_,rej)=>setTimeout(()=>rej(new Error('t')),6000))]);
+    if(r.ok){
+      const raw=await r.json();
+      const d=JSON.parse(raw.contents||'{}');
+      if(d.AbstractText)results+='Summary: '+d.AbstractText+'\n\n';
+      if(d.Answer)results+='Answer: '+d.Answer+'\n\n';
+      if(d.RelatedTopics&&d.RelatedTopics.length){
+        results+='Related:\n';
+        d.RelatedTopics.slice(0,5).forEach(function(t){if(t.Text)results+='- '+t.Text+'\n';});
+        results+='\n';
+      }
+    }
+  }catch(e){}
+  try{
+    const r2=await Promise.race([fetch(htmlUrl),new Promise((_,rej)=>setTimeout(()=>rej(new Error('t')),7000))]);
+    if(r2.ok){
+      const raw2=await r2.json();
+      const html=raw2.contents||'';
+      const snipRe=/<a class="result__snippet"[^>]*>([\s\S]*?)<\/a>/g;
+      const titleRe=/<a class="result__a"[^>]*>([\s\S]*?)<\/a>/g;
+      const titles=[],snips=[];
+      let m;
+      while((m=titleRe.exec(html))!==null&&titles.length<6)titles.push(m[1].replace(/<[^>]+>/g,'').trim());
+      while((m=snipRe.exec(html))!==null&&snips.length<6)snips.push(m[1].replace(/<[^>]+>/g,'').trim());
+      if(titles.length){
+        results+='Web results:\n';
+        titles.forEach(function(t,i){results+=(i+1)+'. '+t+(snips[i]?': '+snips[i]:'')+'\n';});
+      }
+    }
+  }catch(e){}
+  return results.trim()||null;
+}
+
